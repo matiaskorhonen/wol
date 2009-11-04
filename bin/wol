@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 
 require 'optparse'
-require 'lib/wol.rb'
+require 'lib/wakeonlan'
 
 class Runner  
   def self.parse(args)
