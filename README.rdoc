@@ -2,6 +2,12 @@
 
 Ruby Wake-On-LAN gem.
 
+== To Do
+
+* Read from file (just like the perl version)
+* Unify the command line options with the perl version
+* Write tests (IMPORTANT!)
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
