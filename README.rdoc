@@ -14,4 +14,8 @@ Ruby Wake-On-LAN gem.
 
 == Copyright
 
-Copyright (c) 2009 Matias Korhonen. See LICENSE for details.
+Copyright (c) 2009 Matias Korhonen. This project is dual licensed under the Ruby License and the GNU General Public License v3.
+
+This project contains code originally written by K.Kodama. He has been identified as the original author where appropriate.
+
+See LICENSE for details.
