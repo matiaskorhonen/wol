@@ -11,7 +11,7 @@ require "socket"
 
 # Ruby version of the WakeOnLan command.
 class WakeOnLan
-  attr_accessor :mac, :address, :port, :count, :interval, :verbose
+  attr_accessor :macs, :address, :port, :count, :interval, :verbose
   attr_reader :socket
 
   # Create a new instance
@@ -23,7 +23,7 @@ class WakeOnLan
   # * <tt>:interval => 0.01</tt> - How many seconds to wait between sending packets. Defaults to 0.01
   # * <tt>:verbose => false</tt> - What to return?  Returns a string summary if true, else returns <tt>:count</tt>.
   def initialize(options = {})
-    @mac = options[:mac] ||= "ff:ff:ff:ff:ff:ff"
+    @macs = options[:macs] ||= ["ff:ff:ff:ff:ff:ff"]
     @address = options[:address] ||= "255.255.255.255"
     @port = options[:port] ||= 9
     @count = options[:count] || 1
@@ -31,6 +31,7 @@ class WakeOnLan
     @verbose = options[:verbose] || true
 
     @socket=UDPSocket.open()
+    #noinspection RubyResolve
     @socket.setsockopt(Socket::SOL_SOCKET,Socket::SO_BROADCAST,1)
   end
 
@@ -42,22 +43,30 @@ class WakeOnLan
 
   # Wake a host.
   def wake
-    magicpacket = (0xff.chr)*6+(@mac.split(/:/).pack("H*H*H*H*H*H*"))*16
+    messages = ""
 
-    @count.times {
+    @macs.each do |mac|
+      messages << send_packet(mac) + "\n"
+    end
+
+    return messages
+  end
+
+private
+
+  # Send the actual packet
+  def send_packet(mac)
+    magicpacket = (0xff.chr)*6+(mac.split(/:/).pack("H*H*H*H*H*H*"))*16
+
+    @count.times do
       @socket.send(magicpacket, 0, @address, @port)
 
       sleep @interval if @interval > 0 unless @count == 1
-    }
+    end
 
     if @verbose
-      if @count == 1
-        return "Sending magic packet to #{@address}:#{@port} with #{@mac}"
-      else
-        return "Sending magic packet to #{@address}:#{@port} with #{@mac} #{@count} times"
-      end
-    else
-      return @count
+      return @count == 1 ? "Sending magic packet to #{@address}:#{@port} with #{mac}" :
+              "Sending magic packet to #{@address}:#{@port} with #{mac} #{@count} times"
     end
   end
 end
