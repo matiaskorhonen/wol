@@ -21,17 +21,17 @@ class Wol
   # * <tt>:port => 9</tt> - The destination port. Defaults to the discard port, 9
   # * <tt>:count => 1</tt> - How many times to send the MagicPacket.  Defaults to 1
   # * <tt>:interval => 0.01</tt> - How many seconds to wait between sending packets. Defaults to 0.01
-  # * <tt>:verbose => false</tt> - What to return?  Returns a string summary if true, else returns <tt>:count</tt>.
+  # * <tt>:verbose => false</tt> - What to return?  Returns a string summary if true, else returns nil
   def initialize(options = {})
     @macs = options[:macs] ||= ["ff:ff:ff:ff:ff:ff"]
     @address = options[:address] ||= "255.255.255.255"
     @port = options[:port] ||= 9
-    @count = options[:count] || 1
-    @interval = options[:interval] || 0.01
-    @verbose = options[:verbose] || true
+    @count = options[:count] ||= 1
+    @interval = options[:interval] ||= 0.01
+    @verbose = true unless options[:verbose] == false
 
     @socket=UDPSocket.open()
-    #noinspection RubyResolve
+
     @socket.setsockopt(Socket::SOL_SOCKET,Socket::SO_BROADCAST,1)
   end
 
@@ -49,12 +49,10 @@ class Wol
       messages << send_packet(mac) + "\n"
     end
 
-    return messages
-  end
-
-  def wake_many(hosts = [])
-    for host in hosts
-      
+    if @verbose
+      return messages
+    else
+      return nil
     end
   end
 
@@ -70,9 +68,6 @@ private
       sleep @interval if @interval > 0 unless @count == 1
     end
 
-    if @verbose
-      return @count == 1 ? "Sending magic packet to #{@address}:#{@port} with #{mac}" :
-              "Sending magic packet to #{@address}:#{@port} with #{mac} #{@count} times"
-    end
+    return @count == 1 ? "Sending magic packet to #{@address}:#{@port} with #{mac}" : "Sending magic packet to #{@address}:#{@port} with #{mac} #{@count} times"
   end
 end
