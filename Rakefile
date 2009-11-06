@@ -10,6 +10,7 @@ begin
     gem.email = "korhonen.matt@gmail.com"
     gem.homepage = "http://github.com/k33l0r/wol"
     gem.authors = ["Matias Korhonen"]
+    gem.rubyforge_project = 'wol'    
     gem.add_development_dependency "rspec", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

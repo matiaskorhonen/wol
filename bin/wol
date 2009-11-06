@@ -1,8 +1,8 @@
 #!/usr/bin/ruby -w
 
 require 'optparse'
-require 'lib/wol'
-require 'lib/parsefile'
+require 'wol'
+require 'parsefile'
 require 'pp'
 
 class Runner  
@@ -81,13 +81,17 @@ class Runner
   end
 
   def self.version
-    "Ruby Wake-On-LAN version #{File.open("VERSION", "r").read}"
+    "Ruby Wake-On-LAN version 0.1.0"
   end
 
   def self.wake(options)
     begin
       if options[:file].nil?
-        Wol.new(options).wake
+        if !options[:macs].empty?
+          Wol.new(options).wake
+        else
+          "You have to specify a file or MAC address"
+        end
       else
         wake_from_file(options)
       end
