@@ -10,12 +10,22 @@ class ParseFile
             port ||= 9
             host ||= "255.255.255.255"
 
-            hosts << { :mac => mac, :host => host, :port => port}
+            if check_mac(mac) && check_host(host)
+              hosts << { :mac => mac, :host => host, :port => port.to_i}
+            end
           end
         end
       end
     end
     
     return hosts
+  end
+
+  def self.check_mac(mac)
+    /^(\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2})?$/.match(mac)
+  end
+
+  def self.check_host(host)
+    /\A(?:25[0-5]|(?:2[0-4]|1\d|[1-9])?\d)(?:\.(?:25[0-5]|(?:2[0-4]|1\d|[1-9])?\d)){3}\z/.match(host)
   end
 end

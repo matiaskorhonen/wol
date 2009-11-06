@@ -85,10 +85,14 @@ class Runner
   end
 
   def self.wake(options)
-    if options[:file].nil?
-      Wol.new(options).wake
-    else
-      wake_from_file(options)
+    begin
+      if options[:file].nil?
+        Wol.new(options).wake
+      else
+        wake_from_file(options)
+      end
+    rescue
+      "An error occured. Please check your inputs.\nIf you used a file, please check that it is properly formatted."
     end
   end
 
