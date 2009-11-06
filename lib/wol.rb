@@ -10,7 +10,7 @@
 require "socket"
 
 # Ruby version of the WakeOnLan command.
-class WakeOnLan
+class Wol
   attr_accessor :macs, :address, :port, :count, :interval, :verbose
   attr_reader :socket
 
@@ -41,7 +41,7 @@ class WakeOnLan
     @socket=""
   end
 
-  # Wake a host.
+  # Wake host(s)
   def wake
     messages = ""
 
@@ -50,6 +50,12 @@ class WakeOnLan
     end
 
     return messages
+  end
+
+  def wake_many(hosts = [])
+    for host in hosts
+      
+    end
   end
 
 private

@@ -1,14 +1,16 @@
 #!/usr/bin/ruby -w
 
 require 'optparse'
-require 'lib/wakeonlan'
+require 'lib/wol'
+require 'lib/parsefile'
+require 'pp'
 
 class Runner  
   def self.parse(args)
     args = ["-h"] if args.empty?
     
     options = {}
-    options[:brief] = false
+    options[:verbose] = true
     options[:address]  = "255.255.255.255"
     options[:port] = 9
     options[:interval] = 0.01
@@ -25,7 +27,7 @@ class Runner
       opts.separator "Specific options:"
 
       opts.on( '-q', '--quiet', 'No console output' ) do
-        options[:brief] = true
+        options[:verbose] = false
       end
 
       opts.on( '-a', '--address 255.255.255.255', 'Set the destination address' ) do |address|
@@ -81,8 +83,26 @@ class Runner
   def self.version
     "Ruby Wake-On-LAN version #{File.open("VERSION", "r").read}"
   end
+
+  def self.wake(options)
+    if options[:file].nil?
+      Wol.new(options).wake
+    else
+      wake_from_file(options)
+    end
+  end
+
+  def self.wake_from_file(options)
+    message = ""
+    hosts = ParseFile.parse(options[:file])
+
+    for host in hosts
+      options[:host], options[:macs], options[:port] = host[:host], host[:mac], host[:port]
+      message << Wol.new(options).wake
+    end
+
+    return message
+  end
 end
 
-options = Runner.parse(ARGV)
-
-puts WakeOnLan.new(options).wake
+puts Runner.wake(Runner.parse(ARGV))
