@@ -14,11 +14,12 @@ class Runner
     options[:interval] = 0.01
     options[:count] = 3
     options[:macs] = []
+    options[:file] = nil
 
     opts = OptionParser.new do |opts|
       # Set a banner, displayed at the top
       # of the help screen.
-      opts.banner = "Usage: wol -a ADDRESS ff:ff:ff:ff:ff:ff"
+      opts.banner = "#{version}\nUsage: wol -a ADDRESS ff:ff:ff:ff:ff:ff"
 
       opts.separator ""
       opts.separator "Specific options:"
@@ -27,11 +28,11 @@ class Runner
         options[:brief] = true
       end
 
-      opts.on( '-a', '--address 255.255.255.255', 'Address to send to' ) do |address|
+      opts.on( '-a', '--address 255.255.255.255', 'Set the destination address' ) do |address|
         options[:address] = address
       end
 
-      opts.on( '-p', '--port 9', 'Send to port n. Default 9' ) do |port|
+      opts.on( '-p', '--port 9', 'Set the destination port' ) do |port|
         options[:port] = port
       end
 
@@ -43,11 +44,20 @@ class Runner
         options[:count] = count
       end
 
+      opts.on( '-f', '--file FILE', 'TODO: Uses a file as a source of addresses') do |file|
+        options[:file] = file
+      end
+
       opts.separator ""
       opts.separator "Common options:"
 
       opts.on_tail( '-h', '--help', 'Display this message' ) do
         puts opts
+        exit
+      end
+
+      opts.on_tail( '-v', '--version', 'Show version') do
+        puts version
         exit
       end
     end
@@ -66,6 +76,10 @@ class Runner
         STDERR.puts e.message, "\n", opts
         exit(-1)
     end
+  end
+
+  def self.version
+    "Ruby Wake-On-LAN version #{File.open("VERSION", "r").read}"
   end
 end
 
