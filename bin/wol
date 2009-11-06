@@ -5,7 +5,26 @@ require 'wol'
 require 'parsefile'
 require 'pp'
 
-class Runner  
+class Runner
+  SAMPLE_FILE = %{# File structure
+# --------------
+# - blank lines are ignored
+# - comment lines are ignored (lines starting with a hash mark '#')
+# - other lines are considered valid records and can have 3 columns:
+#
+#       Hardware address, IP address, destination port
+#
+#   the last two are optional, in which case the following defaults
+#   are used:
+#
+#       IP address: 255.255.255.255 (the limited broadcast address)
+#       port:       9 (the discard port)
+#
+
+01:02:03:04:05:06   192.168.1.255       9
+07:09:09:0A:0B:0C   255.255.255.255
+0D:0E:0F:00:10:11}
+  
   def self.parse(args)
     args = ["-h"] if args.empty?
     
@@ -55,6 +74,11 @@ class Runner
 
       opts.on_tail( '-h', '--help', 'Display this message' ) do
         puts opts
+        exit
+      end
+
+      opts.on_tail( '-s', '--sample-file', 'Display a sample file') do
+        puts SAMPLE_FILE
         exit
       end
 
