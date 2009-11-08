@@ -1,4 +1,4 @@
-= wol
+= WOL
 
 Ruby Wake-On-LAN gem. While the basic functionality is in place, this gem is still under heavy development, and some things may yet change.
 
