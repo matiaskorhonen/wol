@@ -1,12 +1,10 @@
 = wol
 
-Ruby Wake-On-LAN gem.
+Ruby Wake-On-LAN gem. While the basic functionality is in place, this gem is still under heavy development, and some things may yet change.
 
 == To Do
 
-* Read from file (just like the perl version)
-* Unify the command line options with the perl version
-* Write tests (IMPORTANT!)
+* Write further tests (IMPORTANT!)
 * Refactor the gem structure to something sane
 
 == Note on Patches/Pull Requests
