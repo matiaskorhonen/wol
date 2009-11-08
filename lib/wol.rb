@@ -11,7 +11,7 @@ require "socket"
 
 # Ruby version of the WakeOnLan command.
 class Wol
-  attr_accessor :macs, :address, :port, :count, :interval, :verbose
+  attr_accessor :macs, :address, :port, :count, :interval, :quiet
   attr_reader :socket
 
   # Create a new instance
@@ -21,14 +21,14 @@ class Wol
   # * <tt>:port => 9</tt> - The destination port. Defaults to the discard port, 9
   # * <tt>:count => 1</tt> - How many times to send the MagicPacket.  Defaults to 1
   # * <tt>:interval => 0.01</tt> - How many seconds to wait between sending packets. Defaults to 0.01
-  # * <tt>:verbose => false</tt> - What to return?  Returns a string summary if true, else returns nil
+  # * <tt>:quiet => false</tt> - What to return?  Returns a string summary if false, else returns nil
   def initialize(options = {})
     @macs = options[:macs] ||= ["ff:ff:ff:ff:ff:ff"]
     @address = options[:address] ||= "255.255.255.255"
     @port = options[:port] ||= 9
     @count = options[:count] ||= 1
     @interval = options[:interval] ||= 0.01
-    @verbose = true unless options[:verbose] == false
+    @quiet = options[:quiet]
 
     @socket=UDPSocket.open()
 
@@ -49,10 +49,10 @@ class Wol
       messages << send_packet(mac) + "\n"
     end
 
-    if @verbose
-      return messages
-    else
+    if @quiet
       return nil
+    else
+      return messages
     end
   end
 

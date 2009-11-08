@@ -1,12 +1,12 @@
 #!/usr/bin/ruby -w
 
 require 'optparse'
-require 'wol'
-require 'parsefile'
+require 'lib/wol.rb'
+require 'lib/parsefile.rb'
 require 'pp'
 
 class Runner
-  SAMPLE_FILE = %{# File structure
+  @sample_file = %{# File structure
 # --------------
 # - blank lines are ignored
 # - comment lines are ignored (lines starting with a hash mark '#')
@@ -29,12 +29,12 @@ class Runner
     args = ["-h"] if args.empty?
     
     options = {}
-    options[:verbose] = true
+    options[:quiet] = false
     options[:address]  = "255.255.255.255"
     options[:port] = 9
     options[:interval] = 0.01
     options[:count] = 3
-    options[:macs] = []
+    options[:macs] = Array.new
     options[:file] = nil
 
     opts = OptionParser.new do |opts|
@@ -46,22 +46,22 @@ class Runner
       opts.separator "Specific options:"
 
       opts.on( '-q', '--quiet', 'No console output' ) do
-        options[:verbose] = false
+        options[:quiet] = true
       end
 
       opts.on( '-a', '--address 255.255.255.255', 'Set the destination address' ) do |address|
         options[:address] = address
       end
 
-      opts.on( '-p', '--port 9', 'Set the destination port' ) do |port|
+      opts.on( '-p', '--port 9', Integer, 'Set the destination port' ) do |port|
         options[:port] = port
       end
 
-      opts.on( '-i', '--interval 0.01', 'Interval between sending packets in seconds') do |interval|
+      opts.on( '-i', '--interval 0.01', Float, 'Interval between sending packets in seconds') do |interval|
         options[:interval] = interval
       end
 
-      opts.on( '-c', '--count 3', 'Number of packets to send. Default 3') do |count|
+      opts.on( '-c', '--count 3', Integer, 'Number of packets to send. Default 3') do |count|
         options[:count] = count
       end
 
@@ -78,7 +78,7 @@ class Runner
       end
 
       opts.on_tail( '-s', '--sample-file', 'Display a sample file') do
-        puts SAMPLE_FILE
+        puts @sample_file
         exit
       end
 
@@ -91,13 +91,15 @@ class Runner
     begin
       opts.parse!(args)
 
-      args.each do |arg|
-        options[:macs] << arg if /^(\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2})?$/.match(arg)
-      end
+      if options[:file].nil?
+        args.each do |arg|
+          options[:macs] << arg if /^(\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2})?$/.match(arg)
+        end
 
-      options[:macs].uniq!
+        options[:macs].uniq!
+      end
       
-      options
+      return options
     rescue OptionParser::InvalidOption => e
         STDERR.puts e.message, "\n", opts
         exit(-1)
@@ -108,33 +110,41 @@ class Runner
     "Ruby Wake-On-LAN version 0.1.0"
   end
 
-  def self.wake(options)
+  def self.wake(options = {})
     begin
-      if options[:file].nil?
+      if options[:file].empty?
         if !options[:macs].empty?
-          Wol.new(options).wake
+          puts Wol.new(options).wake unless options[:quiet]
         else
-          "You have to specify a file or MAC address"
+          puts "You have to specify a file or MAC address"
         end
       else
-        wake_from_file(options)
+        puts wake_from_file(options) unless options[:quiet]
       end
-    rescue
-      "An error occured. Please check your inputs.\nIf you used a file, please check that it is properly formatted."
+    rescue Exception => e
+      puts "An error occured. Please check your inputs."
+      puts "If you used a file, please check that it is properly formatted."
+      STDERR.puts e.message
+      exit(-1)
     end
   end
 
-  def self.wake_from_file(options)
+  def self.wake_from_file(options = {})
     message = ""
     hosts = ParseFile.parse(options[:file])
 
     for host in hosts
-      options[:host], options[:macs], options[:port] = host[:host], host[:mac], host[:port]
-      message << Wol.new(options).wake
+      options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
+
+      unless options[:quiet]
+        message << Wol.new(options).wake
+      end
     end
 
-    return message
+    return options[:quiet] ? nil : message
   end
 end
 
-puts Runner.wake(Runner.parse(ARGV))
+options = Runner.parse(ARGV)
+
+Runner.wake(options)
