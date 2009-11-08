@@ -35,7 +35,7 @@ class Wol
     @socket.setsockopt(Socket::SOL_SOCKET,Socket::SO_BROADCAST,1)
   end
 
-  # Close the socket opened by WakeOnLan initialization
+  # Close the socket opened by Wol initialization
   def close
     @socket.close
     @socket=""

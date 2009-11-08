@@ -21,6 +21,10 @@ describe "Wake-On-LAN" do
     Wol.new(:macs => "00:08:a1:a9:58:f6", :address => "example.com", :port => 80).wake.should == "Sending magic packet to example.com:80 with 00:08:a1:a9:58:f6\n"
   end
 
+  it "should send MagicPackets to several hardware addresses at once" do
+    Wol.new(:macs => ["ff:ff:ff:ff:ff:cc", "ff:ff:ff:ff:cc:cc", "ff:ff:ff:ccf:cc:cc"]).wake.should == "Sending magic packet to 255.255.255.255:9 with ff:ff:ff:ff:ff:cc\nSending magic packet to 255.255.255.255:9 with ff:ff:ff:ff:cc:cc\nSending magic packet to 255.255.255.255:9 with ff:ff:ff:ccf:cc:cc\n"
+  end
+
   it "should return nil if quiet is set to true" do
     Wol.new(:quiet => true).wake.should == nil
   end
