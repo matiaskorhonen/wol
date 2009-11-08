@@ -21,7 +21,7 @@ describe "Wake-On-LAN" do
     Wol.new(:macs => "00:08:a1:a9:58:f6", :address => "example.com", :port => 80).wake.should == "Sending magic packet to example.com:80 with 00:08:a1:a9:58:f6\n"
   end
 
-  it "should return nil if verbose is set to false" do
-    Wol.new(:verbose => false).wake.should == nil
+  it "should return nil if quiet is set to true" do
+    Wol.new(:quiet => true).wake.should == nil
   end
 end
