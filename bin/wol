@@ -1,9 +1,8 @@
 #!/usr/bin/ruby -w
 
 require 'optparse'
-require 'lib/wol.rb'
-require 'lib/parsefile.rb'
-require 'pp'
+require 'wol'
+require 'parsefile'
 
 class Runner
   @sample_file = %{# File structure
