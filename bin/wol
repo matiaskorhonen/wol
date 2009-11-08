@@ -106,7 +106,7 @@ class Runner
   end
 
   def self.version
-    "Ruby Wake-On-LAN version 0.2.1"
+    "Ruby Wake-On-LAN version 0.2.2"
   end
 
   def self.wake(options = {})
