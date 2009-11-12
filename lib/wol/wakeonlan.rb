@@ -13,7 +13,7 @@ require "socket"
 
 module Wol
   class WakeOnLan
-    attr_accessor :macs, :address, :port, :count, :interval, :quiet
+    attr_accessor :mac, :address, :port, :count, :delay, :quiet
     attr_reader :socket
 
     # Create a new instance
@@ -22,14 +22,14 @@ module Wol
     # * <tt>:address => "255.255.255.255"</tt> - Specify the destination address.  Either a IP or hostname.  Defaults to "255.255.255.255"
     # * <tt>:port => 9</tt> - The destination port. Defaults to the discard port, 9
     # * <tt>:count => 1</tt> - How many times to send the MagicPacket.  Defaults to 1
-    # * <tt>:interval => 0.01</tt> - How many seconds to wait between sending packets. Defaults to 0.01
+    # * <tt>:delay => 0.01</tt> - How many seconds to wait between sending packets. Defaults to 0.01
     # * <tt>:quiet => false</tt> - What to return?  Returns a string summary if false, else returns nil
     def initialize(options = {})
-      @macs = options[:macs] ||= ["ff:ff:ff:ff:ff:ff"]
+      @mac = options[:mac] ||= "ff:ff:ff:ff:ff:ff"
       @address = options[:address] ||= "255.255.255.255"
       @port = options[:port] ||= 9
       @count = options[:count] ||= 1
-      @interval = options[:interval] ||= 0.01
+      @delay = options[:delay] ||= 0.01
       @quiet = options[:quiet]
 
       @socket=UDPSocket.open()
@@ -43,34 +43,20 @@ module Wol
       @socket=""
     end
 
-    # Wake host(s)
+    # Wake host
     def wake
-      messages = ""
+      magicpacket = (0xff.chr)*6+(@mac.split(/:/).pack("H*H*H*H*H*H*"))*16
 
-      @macs.each do |mac|
-        messages << send_packet(mac) + "\n"
+      @count.times do
+        @socket.send(magicpacket, 0, @address, @port)
+        sleep @delay if @delay > 0 unless @count == 1
       end
 
       if @quiet
         return nil
       else
-        return messages
+        return @count == 1 ? "Sending magic packet to #{@address}:#{@port} with #{@mac}" : "Sending magic packet to #{@address}:#{@port} with #{@mac} #{@count} times"
       end
-    end
-
-    private
-
-    # Send the actual packet
-    def send_packet(mac)
-      magicpacket = (0xff.chr)*6+(mac.split(/:/).pack("H*H*H*H*H*H*"))*16
-
-      @count.times do
-        @socket.send(magicpacket, 0, @address, @port)
-
-        sleep @interval if @interval > 0 unless @count == 1
-      end
-
-      return @count == 1 ? "Sending magic packet to #{@address}:#{@port} with #{mac}" : "Sending magic packet to #{@address}:#{@port} with #{mac} #{@count} times"
     end
   end
 end

@@ -28,7 +28,7 @@ module Wol
       options[:quiet] = false
       options[:address] = "255.255.255.255"
       options[:port] = 9
-      options[:interval] = 0.01
+      options[:delay] = 0.01
       options[:count] = 3
       options[:macs] = Array.new
       options[:file] = nil
@@ -45,7 +45,7 @@ module Wol
           options[:quiet] = true
         end
 
-        opts.on( '-a', '--address 255.255.255.255', 'Set the destination address' ) do |address|
+        opts.on( '-i', '--address 255.255.255.255', 'Set the destination address' ) do |address|
           options[:address] = address
         end
 
@@ -53,8 +53,8 @@ module Wol
           options[:port] = port
         end
 
-        opts.on( '-i', '--interval 0.01', Float, 'Interval between sending packets in seconds') do |interval|
-          options[:interval] = interval
+        opts.on( '-d', '--delay 0.01', Float, 'Delay between sending packets in seconds') do |delay|
+          options[:delay] = delay
         end
 
         opts.on( '-c', '--count 3', Integer, 'Number of packets to send. Default 3') do |count|
@@ -103,19 +103,26 @@ module Wol
     end
 
     def self.version
-      "Ruby Wake-On-LAN version 0.2.2"
+      "Ruby Wake-On-LAN version 0.3.0"
     end
 
     def self.wake(options = {})
       begin
-        if options[:file].nil?
-          if !options[:macs].empty?
-            puts  WakeOnLan.new(options).wake unless options[:quiet]
-          else
-            puts "You have to specify a file or MAC address"
+        if options[:file]
+          hosts = ParseFile.read_and_parse_file(options[:file])
+
+          for host in hosts
+            options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
+
+            puts WakeOnLan.new(options).wake
+          end
+        elsif options[:macs]
+          options[:macs].each do |mac|
+            options[:mac] = mac
+            puts WakeOnLan.new(options).wake
           end
         else
-          puts wake_from_file(options) unless options[:quiet]
+          puts "You have to specify a file or MAC address"
         end
       rescue Exception => e
         puts "An error occured. Please check your inputs."
@@ -123,21 +130,6 @@ module Wol
         STDERR.puts e.message
         exit(-1)
       end
-    end
-
-    def self.wake_from_file(options = {})
-      message = ""
-      hosts = ParseFile.read_and_parse_file(options[:file])
-
-      for host in hosts
-        options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
-
-        unless options[:quiet]
-          message << WakeOnLan.new(options).wake
-        end
-      end
-
-      return options[:quiet] ? nil : message
     end
 
     def self.run!
