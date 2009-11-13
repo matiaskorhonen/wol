@@ -1,6 +1,12 @@
+# Copyright (C) 2009 Matias Korhonen
+#
+# Licensed under the Ruby License: http://www.ruby-lang.org/en/LICENSE.txt
+# and the GNU General Public License: http://www.gnu.org/copyleft/gpl.html
+#
 require 'optparse'
 
 module Wol
+  # Run the Ruby-Wake-On-LAN command, +wol+, and parse the given options
   module Runner
     @sample_file = %{# File structure
 # --------------
@@ -21,6 +27,7 @@ module Wol
 07:09:09:0A:0B:0C   example.com
 0D:0E:0F:00:10:11}
 
+    # Parse the give arguments
     def self.parse(args)
       args = ["-h"] if args.empty?
 
@@ -102,10 +109,13 @@ module Wol
       end
     end
 
+    # Return the version string.
+    # TODO: Fix the way the version is defined.
     def self.version
-      "Ruby Wake-On-LAN version 0.3.0"
+      "Ruby Wake-On-LAN version 0.3.1"
     end
 
+    # Send WOL MagicPackets based on the parsed options
     def self.wake(options = {})
       begin
         if options[:file]
@@ -132,6 +142,7 @@ module Wol
       end
     end
 
+    # Parse the command line options, then use them to wake up any given hosts.
     def self.run!
       options = parse(ARGV)
 

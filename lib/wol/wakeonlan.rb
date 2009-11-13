@@ -1,8 +1,5 @@
-# Copyright (C) 2000-2003  K.Kodama
+# Copyright (C) 2000-2009  K.Kodama, Matias Korhonen
 # Original: http://www.math.kobe-u.ac.jp/~kodama/tips-WakeOnLAN.html
-#
-# Modified by Matias Korhonen (26.09.2009: Removed command line options, changed to
-# send the magic packet straight to the IP, not the broadcast address)
 #
 # Licensed under the Ruby License: http://www.ruby-lang.org/en/LICENSE.txt
 # and the GNU General Public License: http://www.gnu.org/copyleft/gpl.html
@@ -13,17 +10,28 @@ require "socket"
 
 module Wol
   class WakeOnLan
-    attr_accessor :mac, :address, :port, :count, :delay, :quiet
+    # Specify the destination MAC Address. Defaults to the broadcast MAC, "ff:ff:ff:ff:ff:ff"
+    attr_accessor :mac
+
+    # Specify the destination address.  Either a IP or hostname.  Defaults to "255.255.255.255"
+    attr_accessor :address
+
+    # The destination port. Defaults to the discard port, 9
+    attr_accessor :port
+
+    # How many times to send the MagicPacket.  Defaults to 1
+    attr_accessor :count
+
+    # How many seconds to wait between sending packets. Defaults to 0.01
+    attr_accessor :delay
+
+    # What to return?  Returns a string summary if false, else returns nil
+    attr_accessor :quiet
+
+    # The socket opened by WakeOnLan initialization
     attr_reader :socket
 
-    # Create a new instance
-    # == Options
-    # * <tt>:mac => "ff:ff:ff:ff:ff:ff"</tt> - Specify the destination MAC Address. Defaults to the broadcast MAC, "ff:ff:ff:ff:ff:ff"
-    # * <tt>:address => "255.255.255.255"</tt> - Specify the destination address.  Either a IP or hostname.  Defaults to "255.255.255.255"
-    # * <tt>:port => 9</tt> - The destination port. Defaults to the discard port, 9
-    # * <tt>:count => 1</tt> - How many times to send the MagicPacket.  Defaults to 1
-    # * <tt>:delay => 0.01</tt> - How many seconds to wait between sending packets. Defaults to 0.01
-    # * <tt>:quiet => false</tt> - What to return?  Returns a string summary if false, else returns nil
+    # Create a new WakeOnLan instance. See the WakeOnLan class documentation for options.
     def initialize(options = {})
       @mac = options[:mac] ||= "ff:ff:ff:ff:ff:ff"
       @address = options[:address] ||= "255.255.255.255"

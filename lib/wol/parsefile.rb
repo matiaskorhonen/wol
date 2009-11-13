@@ -1,5 +1,11 @@
-# Parse a text file containing hardware addresses, host names/addresses, and port numbers
+# Copyright (C) 2009 Matias Korhonen
+#
+# Licensed under the Ruby License: http://www.ruby-lang.org/en/LICENSE.txt
+# and the GNU General Public License: http://www.gnu.org/copyleft/gpl.html
+
+# Ruby Wake-On-LAN
 module Wol
+  # Parse a text file containing hardware addresses, host names/addresses, and port numbers
   module ParseFile
 
     # Parse a given string and return a hash containing the results

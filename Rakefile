@@ -35,11 +35,21 @@ task :spec => :check_dependencies
 task :default => :spec
 
 require 'rake/rdoctask'
+gem 'rdoc'
+require 'rdoc/rdoc'
+
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "test #{version}"
+  rdoc.title = "Ruby Wake-On-LAN #{version}"
   rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('COPYING')
+  rdoc.rdoc_files.include('LICENSE')
   rdoc.rdoc_files.include('lib/**/*.rb')
+  
+  rdoc.options += [
+          '-HN',
+          '-f', 'darkfish',
+  ]
 end
