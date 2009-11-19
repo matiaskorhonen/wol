@@ -120,7 +120,7 @@ module Wol
       if options[:file]
         hosts = ParseFile.read_and_parse_file(options[:file])
 
-        for host in hosts
+        hosts.each do |host|
           options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
 
           message = WakeOnLan.new(options).wake.to_s
