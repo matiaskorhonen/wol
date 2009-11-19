@@ -43,7 +43,7 @@ module Wol
       opts = OptionParser.new do |opts|
         # Set a banner, displayed at the top
         # of the help screen.
-        opts.banner = "#{version}\nUsage: wol -a ADDRESS ff:ff:ff:ff:ff:ff"
+        opts.banner = "#{version}\nUsage: wol -i ADDRESS ff:ff:ff:ff:ff:ff"
 
         opts.separator ""
         opts.separator "Specific options:"
