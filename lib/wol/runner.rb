@@ -117,36 +117,41 @@ module Wol
 
     # Send WOL MagicPackets based on the parsed options
     def self.wake(options = {})
-      begin
-        if options[:file]
-          hosts = ParseFile.read_and_parse_file(options[:file])
+      if options[:file]
+        hosts = ParseFile.read_and_parse_file(options[:file])
 
-          for host in hosts
-            options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
+        for host in hosts
+          options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
 
-            puts WakeOnLan.new(options).wake
-          end
-        elsif options[:macs]
-          options[:macs].each do |mac|
-            options[:mac] = mac
-            puts WakeOnLan.new(options).wake
-          end
-        else
-          puts "You have to specify a file or MAC address"
+          message = WakeOnLan.new(options).wake.to_s
+          puts message unless options[:quiet]
+          return 0
         end
-      rescue Exception => e
-        puts "An error occured. Please check your inputs."
-        puts "If you used a file, please check that it is properly formatted."
-        STDERR.puts e.message
-        exit(-1)
+      elsif !options[:macs].empty?
+        options[:macs].each do |mac|
+          options[:mac] = mac
+          message = WakeOnLan.new(options).wake.to_s
+          puts message unless options[:quiet]
+          return 0
+        end
+      else
+        puts "You have to specify a file or MAC address"
       end
     end
 
     # Parse the command line options, then use them to wake up any given hosts.
-    def self.run!
-      options = parse(ARGV)
+    def self.run!(argv)
+      begin
+        options = parse(argv)
 
-      wake(options)
+        wake(options)
+        return 0
+      rescue Exception => e
+        puts "An error occured. Please check your inputs."
+        puts "If you used a file, please check that it is properly formatted."
+        STDERR.puts e.message
+        return -1
+      end
     end
   end
 end
