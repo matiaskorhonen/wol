@@ -27,128 +27,129 @@ module Wol
 07:09:09:0A:0B:0C   example.com
 0D:0E:0F:00:10:11}
 
-    # Parse the give arguments
-    def self.parse(args)
-      args = ["-h"] if args.empty?
+    @options = { :quiet => false,
+                 :address => "255.255.255.255",
+                 :port => 9,
+                 :delay => 0.01,
+                 :count => 3,
+                 :macs => [],
+                 :file => nil,
+                 :nothing_to_wake => false}
 
-      options = {}
-      options[:quiet] = false
-      options[:address] = "255.255.255.255"
-      options[:port] = 9
-      options[:delay] = 0.01
-      options[:count] = 3
-      options[:macs] = Array.new
-      options[:file] = nil
+    # Parse the give arguments
+    def self.parse!(args)
+      args = ["-h"] if args.empty?
 
       opts = OptionParser.new do |opts|
         # Set a banner, displayed at the top
         # of the help screen.
-        opts.banner = "#{version}\nUsage: wol -i ADDRESS ff:ff:ff:ff:ff:ff"
+        opts.banner = "Ruby Wake-On-LAN #{version}\nUsage: wol -i ADDRESS ff:ff:ff:ff:ff:ff"
 
-        opts.separator ""
-        opts.separator "Specific options:"
+        opts.separator "\nSpecific options:"
 
         opts.on( '-q', '--quiet', 'No console output' ) do
-          options[:quiet] = true
+          @options[:quiet] = true
         end
 
         opts.on( '-i', '--address 255.255.255.255', 'Set the destination address' ) do |address|
-          options[:address] = address
+          @options[:address] = address
         end
 
         opts.on( '-p', '--port 9', Integer, 'Set the destination port' ) do |port|
-          options[:port] = port
+          @options[:port] = port
         end
 
         opts.on( '-d', '--delay 0.01', Float, 'Delay between sending packets in seconds') do |delay|
-          options[:delay] = delay
+          @options[:delay] = delay
         end
 
         opts.on( '-c', '--count 3', Integer, 'Number of packets to send. Default 3') do |count|
-          options[:count] = count
+          @options[:count] = count
         end
 
         opts.on( '-f', '--file FILE', 'TODO: Uses a file as a source of addresses') do |file|
-          options[:file] = file
+          @options[:file] = file
         end
 
-        opts.separator ""
-        opts.separator "Common options:"
+        opts.separator "\nCommon options:"
 
         opts.on_tail( '-h', '--help', 'Display this message' ) do
+          @options[:nothing_to_wake] = true
           puts opts
-          exit
         end
 
         opts.on_tail( '-s', '--sample-file', 'Display a sample file') do
+          @options[:nothing_to_wake] = true
           puts @sample_file
-          exit
         end
 
         opts.on_tail( '-v', '--version', 'Show version') do
-          puts version
-          exit
+          @options[:nothing_to_wake] = true
+          puts "Ruby Wake-On-LAN #{version}"
         end
       end
 
       begin
         opts.parse!(args)
 
-        if options[:file].nil?
+        if @options[:file].nil?
           args.each do |arg|
-            options[:macs] << arg if /^(\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2})?$/.match(arg)
+            @options[:macs] << arg if /^(\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2}:\S{1,2})?$/.match(arg)
           end
 
-          options[:macs].uniq!
+          @options[:macs].uniq!
         end
 
-        return options
+        return @options
       rescue OptionParser::InvalidOption => e
         STDERR.puts e.message, "\n", opts
-        exit(-1)
+        return -1
       end
     end
 
-    # Return the version string.
-    # TODO: Fix the way the version is defined.
+    # Return the version from the VERSION file if it exists
     def self.version
-      "Ruby Wake-On-LAN version 0.3.1"
+      File.exist?('VERSION') ? File.read('VERSION') : ""
     end
 
     # Send WOL MagicPackets based on the parsed options
-    def self.wake(options = {})
-      if options[:file]
-        hosts = ParseFile.read_and_parse_file(options[:file])
+    def self.wake!
+      if @options[:file]
+        hosts = ParseFile.read_and_parse_file(@options[:file])
 
         hosts.each do |host|
-          options[:address], options[:macs], options[:port] = host[:address], host[:mac], host[:port]
+          @options[:address], @options[:macs], @options[:port] = host[:address], host[:mac], host[:port]
 
-          message = WakeOnLan.new(options).wake.to_s
+          message = WakeOnLan.new(@options).wake.to_s
           puts message unless options[:quiet]
+
           return 0
         end
-      elsif !options[:macs].empty?
-        options[:macs].each do |mac|
-          options[:mac] = mac
-          message = WakeOnLan.new(options).wake.to_s
-          puts message unless options[:quiet]
-          return 0
+      elsif !@options[:macs].empty?
+        @options[:macs].each do |mac|
+          @options[:mac] = mac
+          message = WakeOnLan.new(@options).wake.to_s
+          puts message unless @options[:quiet]
         end
+
+        return 0
+      elsif @options[:macs].empty? && @options[:file].nil? && !@options[:nothing_to_wake]
+        raise Exception, "You must supply a MAC address or a file"
       else
-        puts "You have to specify a file or MAC address"
+        return -1
       end
     end
 
     # Parse the command line options, then use them to wake up any given hosts.
     def self.run!(argv)
       begin
-        options = parse(argv)
+        parse!(argv)
 
-        wake(options)
-        return 0
+        return wake!
+      rescue SocketError => e
+        puts e.message
+        return -1
       rescue Exception => e
-        puts "An error occured. Please check your inputs."
-        puts "If you used a file, please check that it is properly formatted."
         STDERR.puts e.message
         return -1
       end
