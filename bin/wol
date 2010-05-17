@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
 require 'wol'
-wol = Wol::Runner.new
 
-exit wol.run(ARGV)
+exit Wol::Runner.run(ARGV)

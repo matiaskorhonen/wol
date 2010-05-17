@@ -6,7 +6,8 @@
 require 'optparse'
 
 # Run the Ruby-Wake-On-LAN command, +wol+, and parse the given options
-class Wol::Runner  
+module Wol
+  module Runner
   @sample_file = %{# File structure
 # --------------
 # - blank lines are ignored
@@ -26,7 +27,6 @@ class Wol::Runner
 07:09:09:0A:0B:0C   example.com
 0D:0E:0F:00:10:11}
 
-  def initialize
     @options = { :quiet => false,
                  :address => "255.255.255.255",
                  :port => 9,
@@ -34,11 +34,10 @@ class Wol::Runner
                  :count => 3,
                  :macs => [],
                  :file => nil,
-                :nothing_to_wake => false }                
-  end
+                 :nothing_to_wake => false }                
 
   # Parse the give arguments
-  def parse!(args)
+  def self.parse!(args)
     args = ["-h"] if args.empty?
 
     opts = OptionParser.new do |opts|
@@ -109,7 +108,7 @@ class Wol::Runner
   end
 
   # Send WOL MagicPackets based on the parsed options
-  def wake
+  def self.wake
     if @options[:file]
       hosts = ParseFile.read_and_parse_file(@options[:file])
 
@@ -137,7 +136,7 @@ class Wol::Runner
   end
 
   # Parse the command line options, then use them to wake up any given hosts.
-  def run(argv)
+  def self.run(argv)
     begin
       parse!(argv)
 
@@ -149,5 +148,6 @@ class Wol::Runner
       STDERR.puts e.message
       return -1
     end
-  end    
+  end
+  end
 end

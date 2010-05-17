@@ -1,7 +1,6 @@
 source "http://rubygems.org"
 
-# Will automatically pull in this gem and all its
-# dependencies specified in the gemspec
+# Will automatically pull in this gem and all its dependencies specified in the gemspec
 gem "wol", :path => File.expand_path("..", __FILE__)
 
 # These are development dependencies 
