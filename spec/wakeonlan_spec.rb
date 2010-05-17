@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require "spec_helper"
 
 describe "Wake-On-LAN" do
   it "should send a MagicPacket to the broadcast addresses" do
@@ -23,5 +23,9 @@ describe "Wake-On-LAN" do
 
   it "should return nil if quiet is set to true" do
     Wol::WakeOnLan.new(:quiet => true).wake.should == nil
+  end
+  
+  it "should return the version number as a string" do
+    Wol::VERSION.class.should == String
   end
 end

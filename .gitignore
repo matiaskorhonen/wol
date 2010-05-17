@@ -13,10 +13,16 @@ tmtags
 ## VIM
 *.swp
 
+## Other editors
+.idea
+tags
+
 ## PROJECT::GENERAL
 coverage
 rdoc
 pkg
+.bundle
+*.gem
 
 ## PROJECT::SPECIFIC
-.idea
+

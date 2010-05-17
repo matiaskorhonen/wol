@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require "spec_helper"
 
 EXPECTED = [{:port=>9, :mac=>"01:02:03:04:05:06", :address=>"192.168.1.255"},
             {:port=>12, :mac=>"01:02:03:04:05:06", :address=>"192.168.2.230"},

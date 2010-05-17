@@ -1,9 +1,10 @@
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'wol'
-require 'spec'
-require 'spec/autorun'
+require "rubygems"
+require "bundler"
+Bundler.setup
 
-Spec::Runner.configure do |config|
+require "rspec"
+require "wol"
+
+Rspec.configure do |config|
   
 end

@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-
 require 'wol'
+wol = Wol::Runner.new
 
-exit Wol::Runner.run!(ARGV)
+exit wol.run(ARGV)
