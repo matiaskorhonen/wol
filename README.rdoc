@@ -4,7 +4,7 @@ Ruby Wake-On-LAN gem.
 
 == To Do
 
-* Write further tests for teh CLI functionality
+* Write further tests for the CLI functionality
 
 == Note on Patches/Pull Requests
  
