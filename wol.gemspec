@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.email       = ["me@matiaskorhonen.fi"]
   gem.homepage    = "http://github.com/k33l0r/wol"
   gem.summary     = "Ruby Wake-On-LAN"
-  gem.description = "Send Wake-On-LAN magic packets from Ruby or from CLI"
+  gem.description = "Send Wake-On-LAN magic packets from Ruby or from the CLI"
 
   gem.name          = "wol"
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }

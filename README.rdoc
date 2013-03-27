@@ -1,10 +1,6 @@
 = WOL
 
-Ruby Wake-On-LAN gem.
-
-== To Do
-
-* Write further tests for the CLI functionality
+Send Wake-On-LAN magic packets from Ruby or from the CLI
 
 == Note on Patches/Pull Requests
  
@@ -18,7 +14,7 @@ Ruby Wake-On-LAN gem.
 
 == Copyright
 
-Copyright (c) 2009-2010 Matias Korhonen. This project is dual licensed under the Ruby License and the GNU General Public License v3.
+Copyright (c) 2009-2013 Matias Korhonen. This project is dual licensed under the Ruby License and the GNU General Public License v3.
 
 This project contains a small amount of code originally written by K.Kodama. He has been identified as the original author where appropriate.
 
