@@ -1,28 +1,22 @@
 # -*- encoding: utf-8 -*-
+$:.unshift File.expand_path("../lib", __FILE__)
+require "wol/version"
 
-require File.expand_path("../lib/wol/version", __FILE__)
+Gem::Specification.new do |gem|
+  gem.authors     = ["Matias Korhonen"]
+  gem.email       = ["me@matiaskorhonen.fi"]
+  gem.homepage    = "http://github.com/k33l0r/wol"
+  gem.summary     = "Ruby Wake-On-LAN"
+  gem.description = "Send Wake-On-LAN magic packets from Ruby or from CLI"
 
-Gem::Specification.new do |s|
-  s.name        = "wol"
-  s.version     = Wol::VERSION
-  s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Matias Korhonen"]
-  s.email       = ["me@matiaskorhonen.fi"]
-  s.homepage    = "http://wol.matiaskorhonen.fi"
-  s.summary     = "Ruby Wake-On-LAN"
-  s.description = "Send Wake-On-LAN magic packets from Ruby or from CLI"
+  gem.name          = "wol"
+  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.files         = `git ls-files`.split("\n")
+  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.require_paths = ["lib"]
+  gem.version       = Wol::VERSION
 
-  s.required_rubygems_version = ">= 1.3.6"
-  
-  s.rubyforge_project         = "wol"
-
-  # Files that aren't .rb files
-  s.files        = Dir["{lib}/**/*.rb", "bin/*", "LICENSE", "COPYING", "*.rdoc"]
-  s.require_path = 'lib'
-
-  # If you need an executable, add it here
-  s.executables = ["wol"]
-
-  # If you have C extensions, uncomment this line
-  # s.extensions = "ext/extconf.rb"
+  gem.add_development_dependency "rake"
+  gem.add_development_dependency "bundler"
+  gem.add_development_dependency "rspec", "~> 2.9.0"
 end
